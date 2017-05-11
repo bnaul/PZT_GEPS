@@ -61,7 +61,7 @@ if __name__ == '__main__':
     parser.add_argument("--num_layers", type=int)
     parser.add_argument('--embedding', type=int, default=None)
     parser.add_argument("--drop_frac", type=float, default=0.)
-    parser.add_argument("--batch_size", type=int, default=500)
+    parser.add_argument("--batch_size", type=int, default=1024)
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--lr", type=float)
     parser.add_argument("--layer_type", type=str)
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     model.compile(Adam(args.lr), loss='mse')
 
     history = model.fit(X[train], X[train], epochs=args.epochs, batch_size=args.batch_size,
-                        callbacks=[TQDMCallback()
+                        callbacks=[TQDMCallback(),
                                    TensorBoard(log_dir=log_dir, write_graph=False),
                                    ModelCheckpoint(weights_path)],
                         verbose=False)
