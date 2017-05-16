@@ -10,14 +10,16 @@ from keras.layers import (Dense, Conv1D, GRU, LSTM, Recurrent, Bidirectional,
 def load_data(data_path=os.path.join('data', 'cleaned_data.mat')):
     f = h5py.File(data_path, 'r')
     loop_data = f['filt_AI_mat'][()]
-
     X = np.rollaxis(loop_data.reshape(loop_data.shape[0], -1), 1)
-    X = X.reshape((-1, 256))
-    X -= np.mean(X)
-    X /= np.std(X)
-    X = np.atleast_3d(X)
+    X_resample = np.zeros((X.shape[0],40*128*4))
+    for i in range(X.shape[0]):
+        X_resample[i] = signal.resample(X[i],40*128*4)
+    X_resample = X_resample.reshape((-1, 40*128*4))
+    X_resample -= np.mean(X_resample)
+    X_resample /= np.std(X_resample)
+    X_resample = np.atleast_3d(X_resample)
 
-    return X
+    return X_resample
 
 
 def get_run_id(layer_type, size, embedding, lr, drop_frac, batch_size, **kwargs):
@@ -45,7 +47,7 @@ def rnn_auto(layer, size, num_layers, embedding, n_step, drop_frac=0., bidirecti
         if drop_frac > 0.:
             model.add(Dropout(drop_frac))
     model.add(TimeDistributed(Dense(1, activation='linear')))
-    
+
     return model
 
 
