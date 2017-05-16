@@ -14,7 +14,7 @@ def load_data(data_path=os.path.join('data', 'cleaned_data.mat')):
     X_resample = np.zeros((X.shape[0],40*128*4))
     for i in range(X.shape[0]):
         X_resample[i] = signal.resample(X[i],40*128*4)
-    X_resample = X_resample.reshape((-1, 40*128*4))
+    X_resample = X_resample.reshape((-1, 128*4))
     X_resample -= np.mean(X_resample)
     X_resample /= np.std(X_resample)
     X_resample = np.atleast_3d(X_resample)
