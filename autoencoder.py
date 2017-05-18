@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from scipy import signal
 import h5py
 import tensorflow as tf
 from keras.models import Sequential
