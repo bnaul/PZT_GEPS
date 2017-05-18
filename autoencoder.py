@@ -8,14 +8,14 @@ from keras.layers import (Dense, Conv1D, GRU, LSTM, Recurrent, Bidirectional,
                           TimeDistributed, Dropout, Flatten, RepeatVector, Reshape)
 
 
-def load_data(data_path):
+def load_data(data_path,resample_size = 256):
     f = h5py.File(data_path, 'r')
     loop_data = f['filt_AI_mat'][()]
     X = np.rollaxis(loop_data.reshape(loop_data.shape[0], -1), 1)
-    X_resample = np.zeros((X.shape[0],40*128*4))
+    X_resample = np.zeros((X.shape[0],40*resample_size))
     for i in range(X.shape[0]):
-        X_resample[i] = signal.resample(X[i],40*128*4)
-    X_resample = X_resample.reshape((-1, 128*4))
+        X_resample[i] = signal.resample(X[i],40*resample_size)
+    X_resample = X_resample.reshape((-1, resample_size))
     X_resample -= np.mean(X_resample)
     X_resample /= np.std(X_resample)
     X_resample = np.atleast_3d(X_resample)
