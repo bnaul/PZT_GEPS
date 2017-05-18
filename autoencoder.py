@@ -7,7 +7,7 @@ from keras.layers import (Dense, Conv1D, GRU, LSTM, Recurrent, Bidirectional,
                           TimeDistributed, Dropout, Flatten, RepeatVector, Reshape)
 
 
-def load_data(data_path=os.path.join('data', 'cleaned_data.mat')):
+def load_data(data_path):
     f = h5py.File(data_path, 'r')
     loop_data = f['filt_AI_mat'][()]
     X = np.rollaxis(loop_data.reshape(loop_data.shape[0], -1), 1)
@@ -51,14 +51,15 @@ def rnn_auto(layer, size, num_layers, embedding, n_step, drop_frac=0., bidirecti
     return model
 
 
-if __name__ == '__main__':
+def main(arg_dict=None):
     from keras.optimizers import Adam
     import shutil
     from keras.callbacks import TensorBoard, ModelCheckpoint
     from keras_tqdm import TQDMCallback
 
-    from argparse import ArgumentParser
+    from argparse import ArgumentParser, Namespace
     parser = ArgumentParser()
+    parser.add_argument("--data_path", type=str, default='data/cleaned_data.mat')
     parser.add_argument("--size", type=int)
     parser.add_argument("--num_layers", type=int)
     parser.add_argument('--embedding', type=int, default=None)
@@ -71,20 +72,23 @@ if __name__ == '__main__':
 #    parser.add_argument("--patience", type=int, default=20)
     parser.add_argument('--bidirectional', dest='bidirectional', action='store_true')
     parser.add_argument('--overwrite', dest='overwrite', action='store_true')
+    parser.add_argument('--log_dir', type=str, default='log')
     parser.set_defaults(bidirectional=True, overwrite=False)
-    args = parser.parse_args()
+    args = parser.parse_args(None if arg_dict is None else [])  # don't read argv if arg_dict present
+    if arg_dict:  # merge additional arguments w/ defaults
+        args = Namespace(**{**args.__dict__, **arg_dict})
 
-    if args.layer_type == 'conv' and args.filter_length is None:
-        parser.error("--layer_type {} requires --filter_length".format(args.layer_type))
+#    if args.layer_type == 'conv' and args.filter_length is None:
+#        parser.error("--layer_type {} requires --filter_length".format(args.layer_type))
 
-    X = load_data()
+    X = load_data(args.data_path)
     if args.N_train:
         train = np.arange(args.N_train)
     else:
         train = np.arange(len(X))
 
     run = get_run_id(**args.__dict__)
-    log_dir = os.path.join('log', run)
+    log_dir = os.path.join(args.log_dir, run)
     print("Logging to {}".format(os.path.abspath(log_dir)))
     weights_path = os.path.join(log_dir, 'weights.h5')
     if os.path.exists(weights_path):
@@ -107,3 +111,7 @@ if __name__ == '__main__':
                                    TensorBoard(log_dir=log_dir, write_graph=False),
                                    ModelCheckpoint(weights_path)],
                         verbose=False)
+
+
+if __name__ == '__main__':
+    X, model, history = main()
