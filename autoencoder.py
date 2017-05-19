@@ -8,13 +8,13 @@ from keras.layers import (Dense, Conv1D, GRU, LSTM, Recurrent, Bidirectional,
                           TimeDistributed, Dropout, Flatten, RepeatVector, Reshape)
 
 
-def load_data(data_path,resample_size = 256):
+def load_data(data_path, resample_size=256):
     f = h5py.File(data_path, 'r')
     loop_data = f['filt_AI_mat'][()]
     X = np.rollaxis(loop_data.reshape(loop_data.shape[0], -1), 1)
-    X_resample = np.zeros((X.shape[0],40*resample_size))
+    X_resample = np.zeros((X.shape[0], 40 * resample_size))
     for i in range(X.shape[0]):
-        X_resample[i] = signal.resample(X[i],40*resample_size)
+        X_resample[i] = signal.resample(X[i], 40 * resample_size)
     X_resample = X_resample.reshape((-1, resample_size))
     X_resample -= np.mean(X_resample)
     X_resample /= np.std(X_resample)
@@ -63,9 +63,10 @@ def main(arg_dict=None):
     parser.add_argument("--data_path", type=str, default='data/cleaned_data.mat')
     parser.add_argument("--size", type=int)
     parser.add_argument("--num_layers", type=int)
-    parser.add_argument('--embedding', type=int, default=None)
+    parser.add_argument('--embedding', type=int)
     parser.add_argument("--drop_frac", type=float, default=0.)
     parser.add_argument("--batch_size", type=int, default=1024)
+    parser.add_argument("--n_cycles", type=int, default=256)
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--lr", type=float)
     parser.add_argument("--layer_type", type=str)
@@ -82,7 +83,7 @@ def main(arg_dict=None):
 #    if args.layer_type == 'conv' and args.filter_length is None:
 #        parser.error("--layer_type {} requires --filter_length".format(args.layer_type))
 
-    X = load_data(args.data_path)
+    X = load_data(args.data_path, args.n_cycles)
     if args.N_train:
         train = np.arange(args.N_train)
     else:

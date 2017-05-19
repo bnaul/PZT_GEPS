@@ -24,7 +24,8 @@ def test_autoencoder_rnn(tmpdir):
         for layer_type in ["gru"]:
             test_args = {"size": 4, "drop_frac": 0.25, "epochs": 1, "N_train":
                          5, "lr": 1e-3, "batch_size": 5, "embedding": 2,
-                         "num_layers": num_layers, "layer_type": layer_type,
-                         "sim_type": "test" + "_auto", "log_dir": tmpdir,
-                         "data_path": "tests/test_data.mat"}
+                         "n_cycles": 16, "num_layers": num_layers,
+                         "layer_type": layer_type, "log_dir": tmpdir,
+                         "data_path": "tests/test_data.mat", "overwrite": True}
+            test_args['sim_type'] = autoencoder.get_run_id(**test_args)
             autoencoder.main(test_args)
