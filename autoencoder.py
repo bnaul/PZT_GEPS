@@ -23,8 +23,8 @@ def load_data(data_path, resample_size=256):
     return X_resample
 
 
-def get_run_id(layer_type, size, embedding, lr, drop_frac, batch_size, **kwargs):
-    return (f"{layer_type}{size:03d}_emb{embedding:03d}_{lr:1.0e}"
+def get_run_id(layer_type, size, num_layers, embedding, lr, drop_frac, batch_size, **kwargs):
+    return (f"{layer_type}{size:03d}_x{num_layers}_emb{embedding:03d}_{lr:1.0e}"
             f"_drop{int(100 * drop_frac)}_batch{batch_size}").replace('e-', 'm')
 
 
