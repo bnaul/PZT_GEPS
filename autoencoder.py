@@ -114,6 +114,8 @@ def main(arg_dict=None):
                                    ModelCheckpoint(weights_path)],
                         verbose=False)
 
+    return X, model, history
+
 
 if __name__ == '__main__':
     X, model, history = main()
