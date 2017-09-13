@@ -26,6 +26,7 @@ def test_autoencoder_rnn(tmpdir):
                          5, "lr": 1e-3, "batch_size": 5, "embedding": 2,
                          "n_cycles": 16, "num_layers": num_layers,
                          "layer_type": layer_type, "log_dir": tmpdir,
-                         "data_path": "tests/test_data.mat", "overwrite": True}
+                         "data_path": "tests/test_data.mat", "overwrite": True,
+                         "kernel_size": None}
             test_args['sim_type'] = autoencoder.get_run_id(**test_args)
             autoencoder.main(test_args)

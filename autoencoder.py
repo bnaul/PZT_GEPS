@@ -95,15 +95,19 @@ def main(arg_dict=None):
     parser.add_argument('--bidirectional', dest='bidirectional', action='store_true')
     parser.add_argument('--overwrite', dest='overwrite', action='store_true')
     parser.add_argument('--log_dir', type=str, default='log')
+    parser.add_argument('--cache', type=bool, default=False)
     parser.set_defaults(bidirectional=True, overwrite=False)
     args = parser.parse_args(None if arg_dict is None else [])  # don't read argv if arg_dict present
     if arg_dict:  # merge additional arguments w/ defaults
         args = Namespace(**{**args.__dict__, **arg_dict})
 
-#    X = load_data(args.data_path, args.n_cycles)
-    X = np.load('data/X_256.npy')
-    if args.n_cycles != 256:
-        raise ValueError("256 hard coded")
+    if not args.cache:
+        X = load_data(args.data_path, args.n_cycles)
+    else:
+        X = np.load('data/X_256.npy')
+        if args.n_cycles != 256:
+            raise ValueError("256 hard coded")
+
     if args.N_train:
         train = np.arange(args.N_train)
     else:
@@ -124,8 +128,7 @@ def main(arg_dict=None):
     if issubclass(layer, Recurrent):
         model = rnn_auto(layer, args.size, args.num_layers, args.embedding, n_step=X.shape[1],
                          drop_frac=args.drop_frac)
-
-    if issubclass(layer, Conv1D):
+    elif issubclass(layer, Conv1D):
 #def conv_auto(size, num_layers, embedding, n_step, kernel_size, drop_frac=0., **kwargs):
         model = conv_auto(args.size, args.num_layers, args.embedding, n_step=X.shape[1],
                           kernel_size=args.kernel_size, drop_frac=args.drop_frac)
